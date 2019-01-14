@@ -3,7 +3,8 @@ import {
     View,
     Text,
     StyleSheet,
-    Platform
+    Platform,
+    TouchableOpacity
 } from "react-native";
 
 import { withNavigation } from 'react-navigation'
@@ -13,13 +14,15 @@ import Icon from 'react-native-vector-icons/Ionicons'
 
 const ShoppingCartIcon = (props) => (
     <View style={[{ padding: 5 }, Platform.OS == 'android' ? styles.iconContainer : null]}>
+    <TouchableOpacity onPress={() => props.navigation.navigate('Cart')}>
         <View style={{
             position: 'absolute', height: 30, width: 30, borderRadius: 15, backgroundColor: 'rgba(95,197,123,0.8)', right: 15, bottom: 15, alignItems: 'center', justifyContent: 'center', zIndex: 2000,
 
         }}>
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>2</Text>
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>{props.cartItems.length}</Text>
         </View>
-        <Icon style={{color: '#64A644'}} onPress={() => props.navigation.navigate('Cart')} name="ios-cart" size={30} />
+        <Icon style={{color: '#64A644'}}  name="ios-cart" size={30} />
+        </TouchableOpacity>
     </View>
 )
 

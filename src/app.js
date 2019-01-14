@@ -10,6 +10,8 @@ import ShoppingCartIcon from './containers/Shop/ShoppingCartIcon'
 import ElectronicsScreen from './containers/Shop/ElectronicsScreen'
 import BooksScreen from './containers/Shop/BooksScreen'
 import CartScreen from './containers/Shop/CartScreen'
+import Subcategories from './containers/Shop/Subcategories'
+import Categories from './containers/Shop/Categories'
 import {
   createSwitchNavigator,
   createAppContainer,
@@ -24,7 +26,11 @@ import {
  */
 class App extends Component {
   render() {
-    return <AppContainer />;
+    return(
+    <Provider store={store}>
+    <AppContainer />
+    </Provider>
+    )
   }
 }
 export default App;
@@ -94,7 +100,7 @@ _signOutAsync = async () => {
     
    
       return (
-        <Provider store={store}>
+       
         <View style={styles.container}>
         
         <AuthScreen
@@ -105,7 +111,7 @@ _signOutAsync = async () => {
           onLoginAnimationCompleted={() => this.setState({ isAppReady: true })}
         />
           </View>
-        </Provider>
+      
          
       )
     
@@ -144,11 +150,80 @@ class Profile extends Component {
   }
 }
 
+
+const ShopStack = createStackNavigator(
+  {
+    Shop: {
+      screen: Shop,
+      navigationOptions: ({ navigation }) => {
+        return {
+          headerTitle: 'Shop',
+          headerLeft: (
+            <Icon style={{ paddingLeft: 10 }} onPress={() => navigation.openDrawer()} name="md-menu" size={30} />
+          )
+        };
+      }
+    },
+    Categories: {
+      screen: Categories
+    },
+    Subcategories: {
+      screen: Subcategories
+    }
+  },
+  {
+    initialRouteName: 'Shop',
+    /* The header config from HomeScreen is now here */
+    defaultNavigationOptions: {
+      header: null,
+      headerStyle: {
+        backgroundColor: '#f4511e',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    },
+  }
+);
+
+
+const ProfileStack = createStackNavigator({
+  Profile: {
+    screen: Profile,
+    navigationOptions: ({ navigation }) => {
+      return {
+        headerTitle: 'Profile',
+        headerLeft: (
+          <Icon style={{ paddingLeft: 10 }} onPress={() => navigation.openDrawer()} name="md-menu" size={30} />
+        )
+      };
+    }
+  }
+});
+
+const SettingsStack = createStackNavigator({
+  Settings: {
+    screen: Settings,
+    navigationOptions: ({ navigation }) => {
+      return {
+        headerTitle: 'Settings',
+        headerLeft: (
+          <Icon style={{ paddingLeft: 10 }} onPress={() => navigation.openDrawer()} name="md-menu" size={30} />
+        )
+      };
+    }
+  }
+});
+
+
+
+
 const DashboardTabNavigator = createBottomTabNavigator(
   {
-    Shop,
-    Profile,
-    Settings
+    ShopStack,
+    ProfileStack,
+    SettingsStack
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
@@ -156,15 +231,15 @@ const DashboardTabNavigator = createBottomTabNavigator(
         const { routeName } = navigation.state;
         let IconComponent = Icon;
         let iconName;
-        if (routeName === 'Shop') {
+        if (routeName === 'ShopStack') {
           iconName = `ios-basket`;
           // Sometimes we want to add badges to some icons. 
           // You can check the implementation below.
           
-        } else if (routeName === 'Profile') {
+        } else if (routeName === 'ProfileStack') {
           iconName = `md-people`;
         }
-        else if (routeName === 'Settings') {
+        else if (routeName === 'SettingsStack') {
           iconName = `ios-settings`;
         }
 
@@ -175,17 +250,16 @@ const DashboardTabNavigator = createBottomTabNavigator(
     tabBarOptions: {
       activeTintColor: '#64A644',
       inactiveTintColor: 'gray',
-    },
+    }
+   
   }
 );
 
 const DashboardStackNavigator = createStackNavigator(
   {
     DashboardTabNavigator: DashboardTabNavigator,
-    ElectronicsScreen:{screen:ElectronicsScreen},
-    BooksScreen:{screen:BooksScreen},
-    CartScreen:{screen:CartScreen},
-    
+
+  
   },
   {
     defaultNavigationOptions: ({ navigation }) => {
@@ -230,7 +304,8 @@ const AppSwitchNavigator = createSwitchNavigator({
       title: 'Home',
       header: null //this will hide the header
     } },
-  Dashboard: { screen: AppDrawerNavigator }
+  Dashboard: { screen: AppDrawerNavigator },
+  
 });
 const AppContainer = createAppContainer(AppSwitchNavigator);
 

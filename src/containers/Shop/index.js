@@ -1,11 +1,10 @@
 import React, { Component} from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View , Text , FlatList, StatusBar, Button, SafeAreaView, Dimensions, Image, ScrollView, ImageBackground} from 'react-native'
-import { Provider } from 'react-redux'
-import store from '../../store'
+import { withNavigation } from 'react-navigation'
 import CustomButton from '../../components/CustomButton' 
-
-import ShoppingCartIcon from './ShoppingCartIcon'
+import { connect } from 'react-redux'
+import Categories from './Categories'
 
 
 import { createSwitchNavigator, createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation';
@@ -22,52 +21,21 @@ class Shop extends Component {
  
   constructor(props) {
     super(props);
-    this._getCategoriesFromApiAsync();
+ 
   }
   
   state = {
-    Data:[]
+
     
   }
   static propTypes = {
     logout: PropTypes.func
   }
-  _getCategoriesFromApiAsync=() => {
-    return fetch('http://techfactories.com/test2/index.php?route=api/category&api_token=ef38c7aaa03fdecb94e1035cbd')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        this.setState({ Data:responseJson.data})
-        console.log(this.state.Data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-  _renderItem = ({ item, index }) => {
-    if (item.empty === true) {
-      return <View style={[styles.item, styles.itemInvisible]} />;
-    }
-    return (
-      <View
-        style={styles.item}
-      >
-      <ImageBackground source={img2} style={{
-    width:100,
-    height: 100,
-    
-    alignSelf: 'center',
-    resizeMode: 'contain',
-  }}>
-        
-        </ImageBackground>
-        <Text style={styles.itemText}>{item.name.toUpperCase()}</Text>
-      </View>
-    );
-  };
+
   render () {
-     
+
     return (
-      <Provider store={store}>
+     
         <SafeAreaView style={{flex: 1}}>
         <ScrollView contentContainerStyle={styles.contentContainer}>
         <StatusBar
@@ -83,13 +51,7 @@ class Shop extends Component {
     alignSelf: 'center',
     resizeMode: 'cover',
   }}/>
-      <FlatList
-        data={this.state.Data}
-        style={styles.container}
-        renderItem={this._renderItem}
-        numColumns={numColumns}
-        scrollEnabled={false}
-      />
+      <Categories/>
    </View>
    <View style={{flexDirection:"row",flex:1}}>
    <Image source={img4} style={{
@@ -103,12 +65,18 @@ class Shop extends Component {
    </View>
    </ScrollView>
       </SafeAreaView>
-      </Provider>
+      
     )
   }
 }
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+      addItemToCart: (product) => dispatch({ type: 'ADD_TO_CART', payload: product })
+  }
+}
 
+export default connect(null, mapDispatchToProps)(withNavigation(Shop));
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -151,4 +119,4 @@ const styles = StyleSheet.create({
 
 
 
-export default Shop;
+
