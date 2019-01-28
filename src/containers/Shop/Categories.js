@@ -1,7 +1,7 @@
 import React, { Component} from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View , Text , FlatList, StatusBar, Button, SafeAreaView, Dimensions, Image, ScrollView, ImageBackground, TouchableOpacity} from 'react-native'
-
+import { AsyncStorage } from "react-native"
 import { withNavigation } from 'react-navigation';
 
 
@@ -10,6 +10,7 @@ import { createSwitchNavigator, createStackNavigator, createBottomTabNavigator, 
  * Just a centered logout button.
  */
 const numColumns = 3;
+
 //const { navigation } = this.props;
 let formdata = new FormData();
 formdata.append("category_id", '1')
@@ -22,21 +23,44 @@ class Categories extends Component {
  
   constructor(props) {
     super(props);
-    this._getCategoriesFromApiAsync();
+    
+    
   }
   
   state = {
-    Data:[]
+    Data:[],
+    token:'be0bcbc31f28641dedb77be3e1'
     
   }
   static propTypes = {
     logout: PropTypes.func
   }
+
+  componentDidMount() {
+    this._retrieveData().then(() =>{
+          this._getCategoriesFromApiAsync();
+       } );
+       
+    }
+
+     _retrieveData = async () => {
+  try {
+    const value = await AsyncStorage.getItem('session_token');
+    if (value !== null) {
+      this.setState({ token:value});
+      // We have data!!
+      console.log(value);
+    }
+   } catch (error) {
+      console.log(error);
+   }
+}
   _onPressButton = () =>{
       alert('i am pressed');
   }
+ 
   _getCategoriesFromApiAsync=() => {
-    return fetch('http://techfactories.com/test2/index.php?route=api/category&api_token=bb86ecd54e37af12464ffb1f4e')
+    return fetch('http://techfactories.com/test2/index.php?route=api/category&api_token='+this.state.token)
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({ Data:responseJson.data})
@@ -59,10 +83,11 @@ class Categories extends Component {
             
             this.props.navigation.navigate('Subcategories', {
               itemId: item.category_id,
+              token:this.state.token
              
             });
           }}>
-      <ImageBackground source={img2} style={{
+      <ImageBackground source={{uri:(item.image)?item.image:'http://www.iglax.org/wp-content/uploads/2014/12/placeholder-Copy-1.png'}} style={{
     width:100,
     height: 100,
     
@@ -78,9 +103,9 @@ class Categories extends Component {
     );
   };
   render () {
-     
+   console.log(this.state.Data);
     return (
-     
+
         <FlatList
         data={this.state.Data}
         style={styles.container}
@@ -89,7 +114,7 @@ class Categories extends Component {
         scrollEnabled={false}
          keyExtractor={(item, index) => index.toString()}
       />
-      
+    
     )
   }
 }
@@ -101,6 +126,7 @@ const styles = StyleSheet.create({
  
    
   },
+  
   button: {
     backgroundColor: '#1976D2',
     margin: 20

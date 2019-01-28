@@ -8,6 +8,10 @@ import Opening from './Opening'
 import SignupForm from './SignupForm'
 import LoginForm from './LoginForm'
 import LinearGradient from 'react-native-linear-gradient';
+import { connect } from 'react-redux'
+import thunk from 'redux-thunk';
+import { cartItems,itemsFetchData } from '../../action';
+import store from '../../store'
 const IMAGE_WIDTH = metrics.DEVICE_WIDTH * 0.6
 if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(true)
 
@@ -39,7 +43,7 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
  *   _hideAuthScreen then 1. calls the SignupForm.hideForm(), that hides the form buttons (zoomOut) and the form itself (fadeOut),
  *   2. fadeOut the logo, 3. tells the container that the login animation has completed and that the app is ready to show the next screen (HomeScreen).
  */
-export default class AuthScreen extends Component {
+ class AuthScreen extends Component {
   static propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
@@ -52,6 +56,9 @@ export default class AuthScreen extends Component {
     visibleForm: null // Can be: null | SIGNUP | LOGIN
   }
 
+   componentDidMount() {
+        this.props.fetchData();
+    }
   componentWillUpdate (nextProps) {
     // If the user has logged/signed up succesfully start the hide animation
     if (!this.props.isLoggedIn && nextProps.isLoggedIn) {
@@ -80,6 +87,7 @@ export default class AuthScreen extends Component {
   }
 
   render () {
+     //console.log(this.props.token);
     const { isLoggedIn, isLoading, signup, login } = this.props
     const { visibleForm } = this.state
     // The following style is responsible of the "bounce-up from bottom" animation of the form
@@ -135,6 +143,24 @@ export default class AuthScreen extends Component {
     )
   }
 }
+const mapStateToProps = (state) => {
+    return {
+         token: state.items,
+         hasError: state.itemsHaveError,
+         isLoading: state.itemsAreLoading
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+  
+      fetchData: () => dispatch(itemsFetchData())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AuthScreen);
+
+
 
 const styles = StyleSheet.create({
   container: {

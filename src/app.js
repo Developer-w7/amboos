@@ -1,31 +1,40 @@
 import React, { Component } from 'react'
-import { StyleSheet, View , Text, StatusBar } from 'react-native'
+import { StyleSheet, View ,Image, Text, StatusBar ,SafeAreaView, Dimensions, ScrollView } from 'react-native'
 import AuthScreen from './containers/AuthScreen'
 import Icon from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
 import { AsyncStorage } from "react-native"
 import { Provider } from 'react-redux'
-import store from './store'
+import configureStore from './store';
 import Shop from './containers/Shop'
 import ShoppingCartIcon from './containers/Shop/ShoppingCartIcon'
+import Logo from './containers/Shop/Logo'
 import ElectronicsScreen from './containers/Shop/ElectronicsScreen'
 import BooksScreen from './containers/Shop/BooksScreen'
 import CartScreen from './containers/Shop/CartScreen'
 import Subcategories from './containers/Shop/Subcategories'
+import Product from './containers/Shop/Product'
+
 import Categories from './containers/Shop/Categories'
 import {
   createSwitchNavigator,
   createAppContainer,
   createDrawerNavigator,
   createBottomTabNavigator,
-  createStackNavigator
+  createStackNavigator,
+  DrawerItems
 } from 'react-navigation';
 /**
  * The root component of the application.
  * In this component I am handling the entire application state, but in a real app you should
  * probably use a state management library like Redux or MobX to handle the state (if your app gets bigger).
  */
+
+ 
+ const store = configureStore();
 class App extends Component {
   render() {
+
     return(
     <Provider store={store}>
     <AppContainer />
@@ -169,6 +178,12 @@ const ShopStack = createStackNavigator(
     },
     Subcategories: {
       screen: Subcategories
+    },
+    Product:{
+      screen: Product
+    },
+    CartScreen:{
+      screen: CartScreen
     }
   },
   {
@@ -272,6 +287,9 @@ const DashboardStackNavigator = createStackNavigator(
             size={30}
           />
         ),
+        headerTitle: (
+      <Logo/>
+  ),
          headerRight: (
                 <ShoppingCartIcon />
             ),
@@ -287,7 +305,21 @@ const DashboardStackNavigator = createStackNavigator(
   }
 );
 
+const customDrawerComponent =(props) =>(
+<SafeAreaView>
 
+<ScrollView>
+<LinearGradient start={{x: 0, y: 0}} end={{x: 1, y: 0}} locations={[.1,0.50,1]} colors={['#275CAA', '#4677C4', '#275CAA']} style={styles.linearGradient}>
+<View style={{flex:1,height:150,alignItems: 'center',justifyContent: 'center'}}>
+ <Image style={styles.logo} source={require('./images/logo.png')}/>
+</View>
+  </LinearGradient>
+<DrawerItems {...props} />
+
+
+</ScrollView>
+</SafeAreaView>
+)
 
 const AppDrawerNavigator = createDrawerNavigator({
   Dashboard: {
@@ -297,7 +329,11 @@ const AppDrawerNavigator = createDrawerNavigator({
     screen: Shop
   }
  
-});
+},{
+  contentComponent:customDrawerComponent
+}
+
+);
 const AppSwitchNavigator = createSwitchNavigator({
   Login: { screen: AppDrawerNavigator,
     navigationOptions: {
@@ -312,6 +348,15 @@ const AppContainer = createAppContainer(AppSwitchNavigator);
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    
+  },
+   logo:{
+    width: 130,
+
+    resizeMode:'contain'
+    }, 
+    linearGradient: {
     flex: 1,
     
   }

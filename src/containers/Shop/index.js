@@ -23,17 +23,13 @@ class Shop extends Component {
     super(props);
  
   }
-  
-  state = {
 
-    
-  }
   static propTypes = {
     logout: PropTypes.func
   }
 
   render () {
-
+ 
     return (
      
         <SafeAreaView style={{flex: 1}}>
@@ -51,6 +47,8 @@ class Shop extends Component {
     alignSelf: 'center',
     resizeMode: 'cover',
   }}/>
+ 
+   
       <Categories/>
    </View>
    <View style={{flexDirection:"row",flex:1}}>

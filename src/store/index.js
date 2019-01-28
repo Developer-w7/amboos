@@ -1,5 +1,26 @@
 
-import { createStore, combineReducers } from 'redux'
-import cartItems from '../reducers/cartItems'
+import { createStore, combineReducers, applyMiddleware  } from 'redux'
+import thunk from 'redux-thunk';
+import rootReducer from '../reducers';
+const enhancer = applyMiddleware(thunk)
 
-export default store = createStore(cartItems)
+
+export default function configureStore(initialState) {
+
+    // const composeEnhancers = 
+    //     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?   
+    //         window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+    //             // options like actionSanitizer, stateSanitizer
+    //         }) : compose;
+
+    // const enhancer = composeEnhancers(
+    //     applyMiddleware(thunk)
+    // );
+
+    const enhancer = applyMiddleware(thunk)
+
+    return createStore(
+        rootReducer,
+        enhancer
+    );
+}
