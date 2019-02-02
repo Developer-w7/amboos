@@ -1,6 +1,7 @@
 import React, { Component} from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View , Text , FlatList, ActivityIndicator, StatusBar, Button, SafeAreaView, Dimensions, Image, ScrollView, ImageBackground, TouchableOpacity} from 'react-native'
+import Icon from 'react-native-vector-icons/Ionicons'
 import { connect } from 'react-redux'
 import thunk from 'redux-thunk';
 import HTMLView from 'react-native-htmlview';
@@ -84,11 +85,12 @@ class Product extends Component {
  _renderimages = (images) =>{
 
 return   <ImageBackground source={{uri:images}} style={{
-    width:250,
-    height: 250,
+    width:150,
+    height: 150,
     
     alignSelf: 'center',
     resizeMode: 'contain',
+
   }}>
         
         </ImageBackground>
@@ -96,7 +98,7 @@ return   <ImageBackground source={{uri:images}} style={{
   render () {
     
 
-    console.log(this.state.Data);
+ 
 
     if(this.state.loader == false){
     	 return (
@@ -104,15 +106,24 @@ return   <ImageBackground source={{uri:images}} style={{
         <ScrollView>
      <View style={styles.container}>
        {this._renderimages(this.state.Data.thumb)} 
-           <Text style={styles.price}>{this.state.Data.name}</Text>
+           <Text style={styles.product_name}>{this.state.Data.name.toUpperCase()}</Text>
+        <Text style={styles.price}>{this.state.Data.price}</Text>
+        <View style={{flex:1,flexDirection: 'row' ,alignItems: 'center' ,paddingVertical: 14  }}>
+         <TouchableOpacity  style={{paddingVertical: 20,marginRight: 1,backgroundColor: '#1B4C99',flex:1,flexDirection: 'row' ,alignItems: 'center',justifyContent: 'center'      }} onPress={() => this.props.addItemToCart({"product_id":this.state.Data.product_id,"product_name":this.state.Data.name,"thumb":this.state.Data.thumb})}>
+       
+            <Icon style={{color: '#fff',paddingHorizontal: 8}}  name="ios-cart" size={30} /><Text style={{color: '#fff', fontWeight: 'bold' }}>Add to cart</Text>
+   
         
-         <Button
-  onPress={() => this.props.addItemToCart({"product_id":this.state.Data.product_id,"product_name":this.state.Data.name,"thumb":this.state.Data.thumb})}
-  title="Add to cart"
-  color="#841584"
-  accessibilityLabel="Learn more about this purple button"
-/>
-          <Text style={styles.price}>{this.state.Data.price}</Text>
+        </TouchableOpacity>
+         <TouchableOpacity  style={{paddingVertical: 20,marginLeft: 1,backgroundColor: '#eee',flex:1,flexDirection: 'row' ,alignItems: 'center',justifyContent: 'center'      }} onPress={() => this.props.addItemToCart({"product_id":this.state.Data.product_id,"product_name":this.state.Data.name,"thumb":this.state.Data.thumb})}>
+       
+            <Icon style={{color: 'red',paddingHorizontal: 8}}  name="ios-heart" size={30} /><Text style={{color: '#000', fontWeight: 'bold' }}>Add to wishlist</Text>
+   
+        
+        </TouchableOpacity>
+    
+</View>
+          
           <HTMLView
         value={this.state.Data.description}
         stylesheet={htmlstyles}
@@ -168,62 +179,27 @@ export default connect(mapStateToProps, mapDispatchToProps)(Product);
 
 const htmlstyles = StyleSheet.create({
   p:{
-color: '#000',
+color: '#666',
     fontWeight: 'normal',
-    fontSize:15,
+    fontSize:12,
     textAlign: 'center',
     alignItems: 'center',
     justifyContent: 'center',
+    lineHeight: 24
   }
 });
 
 
 const styles = StyleSheet.create({
   loader:{
-flex: 1,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
 
   },
-  p:{
-color: '#000',
-    fontWeight: 'normal',
-    fontSize:10,
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   container: {
     flex: 1,
- 
-   
-  },
-  button: {
-    backgroundColor: '#1976D2',
-    margin: 20
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold'
-  },
-  item: {
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    margin: 1,
-    height: (Dimensions.get('window').width / numColumns)+30, // approximate a square
-  },
-  itemInvisible: {
-    backgroundColor: 'transparent',
-  },
-  itemText: {
-    color: '#000',
-    fontWeight: 'normal',
-    fontSize:10,
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
+ paddingVertical: 30
   },
   contentContainer: {
     paddingVertical: 0
@@ -231,7 +207,16 @@ color: '#000',
   price:{
     textAlign: 'center' ,
     paddingVertical: 4,
-    color: 'red'
+    color: '#000',
+  paddingVertical: 10,
+  letterSpacing: 2
+  },
+  product_name:{
+     textAlign: 'center' ,
+    color: '#666',
+    paddingVertical: 5,
+    fontWeight:'bold',
+    fontSize: 11
   }
 })
 

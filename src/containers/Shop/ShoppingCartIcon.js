@@ -22,7 +22,7 @@ const ShoppingCartIcon = (props) => (
         }}>
             <Text style={{ color: 'white', fontWeight: 'bold' }}>{props.cartItems.length}</Text>
         </View>
-        <Icon style={{color: '#64A644'}}  name="ios-cart" size={30} />
+        <Icon style={{color: '#64A644',paddingHorizontal: 4}}  name="ios-cart" size={30} />
         </TouchableOpacity>
     </View>
 )

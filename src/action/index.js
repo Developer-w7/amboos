@@ -6,6 +6,58 @@ let formdata = new FormData();
 formdata.append("username", "mobileApp");
 formdata.append("key", "IFu3tSrg7QVawbbOyCV1E1a3pZe3j1UnCYnGlr4iSgtvDX5smqK72xUTstCMy20JuWZNnd5qws2gyswjcM1UFwmZVeGZLp1XgfPcvTrllu3SQugVWJKlmUxQrFYNBGLMDaBL34lS5yiHwZIgnCTugBichPfUnGbS1HVPOSs2u51EQArAOYyAg06RduVubpgLYF8G16j6D0foYk8rIcfCmWP6WdTlQ38eAyLY3fxTE4BvqsirFUbWprBySx2qEu0r");
  
+
+ export function getData(type,data) {
+    return {
+        type: type,
+        payload:data
+    };
+}
+
+
+
+export function FetchData(token,type) {
+    return (dispatch) => {
+      let url="";
+      if(type == "GET_PROFILE_DETAILS"){
+        url= "http://techfactories.com/test2/index.php?route=api/account&api_token=";
+      }
+      if(type == "GET_ORDER_DETAILS"){
+        url= "http://techfactories.com/test2/index.php?route=api/account/customerOrder&api_token=";
+      }
+      if(type == "GET_TRANSACTION_DETAILS"){
+        url= "http://techfactories.com/test2/index.php?route=api/transactions&api_token=";
+      }
+
+
+    fetch(url+token)
+
+     
+      .then((response) => response.json())
+      .then((responseJson) => {
+
+     
+          dispatch(getData(type,responseJson.data));
+    
+      
+
+        
+
+      })
+      .catch((error) => {
+        console.error(error);
+        //dispatch(itemsHaveError(true))
+      });
+
+
+    
+}
+}
+
+
+
+
+
 export function cartItems(cartitem,type) {
     return {
         type: type,
@@ -83,3 +135,4 @@ export function itemsFetchData() {
 
     };
 }
+

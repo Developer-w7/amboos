@@ -49,7 +49,7 @@ class Categories extends Component {
     if (value !== null) {
       this.setState({ token:value});
       // We have data!!
-      console.log(value);
+      //console.log(value);
     }
    } catch (error) {
       console.log(error);
@@ -103,7 +103,7 @@ class Categories extends Component {
     );
   };
   render () {
-   console.log(this.state.Data);
+   
     return (
 
         <FlatList

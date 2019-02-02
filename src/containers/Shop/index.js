@@ -1,6 +1,7 @@
 import React, { Component} from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View , Text , FlatList, StatusBar, Button, SafeAreaView, Dimensions, Image, ScrollView, ImageBackground} from 'react-native'
+import Icon from 'react-native-vector-icons/Ionicons';
 import { withNavigation } from 'react-navigation'
 import CustomButton from '../../components/CustomButton' 
 import { connect } from 'react-redux'
@@ -12,6 +13,28 @@ import { createSwitchNavigator, createStackNavigator, createBottomTabNavigator, 
  * Just a centered logout button.
  */
 const numColumns = 3;
+const slides = [
+  {
+    image: require('./images/Order-Groceries.jpg'),
+    imageWidth:  Dimensions.get('window').width,
+    imageHeight: 250,
+    title: 'Hello World',
+    subtitle: 'This is a beautiful world',
+    titleColor: '#fff',
+    subtitleColor: '#fff',
+    resizeMode: 'cover'
+  },
+  {
+    image: require('./images/Order-Groceries.jpg'),
+    imageWidth:  Dimensions.get('window').width,
+    imageHeight: 250,
+    title: 'Bye World',
+    subtitle: 'This is a see you soon',
+    titleColor: '#fff',
+    subtitleColor: '#fff',
+    resizeMode: 'cover'
+  }
+];
 var img1 = require('./images/Order-Groceries.jpg');
 var img2 = require('./images/pepper.jpg');
 var img3 = require('./images/lactaid.png');
@@ -23,7 +46,12 @@ class Shop extends Component {
     super(props);
  
   }
-
+  static navigationOptions={
+drawerIcon:()=>(
+  <Icon style={{fontSize:24,color:"#000" }} name="ios-home" />
+  )
+  }
+ 
   static propTypes = {
     logout: PropTypes.func
   }
@@ -40,7 +68,7 @@ class Shop extends Component {
     
    />
       <View style={styles.container}>
-      <Image source={img1} style={{
+        <Image source={img1} style={{
     width: Dimensions.get('window').width,
     height: 250,
     
@@ -48,7 +76,6 @@ class Shop extends Component {
     resizeMode: 'cover',
   }}/>
  
-   
       <Categories/>
    </View>
    <View style={{flexDirection:"row",flex:1}}>

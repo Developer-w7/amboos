@@ -14,6 +14,8 @@ import BooksScreen from './containers/Shop/BooksScreen'
 import CartScreen from './containers/Shop/CartScreen'
 import Subcategories from './containers/Shop/Subcategories'
 import Product from './containers/Shop/Product'
+import Profile from './containers/profile/Profile'
+import Settings from './containers/Settings/'
 
 import Categories from './containers/Shop/Categories'
 import {
@@ -129,35 +131,10 @@ _signOutAsync = async () => {
 }
 
 
-class Feed extends Component {
-  render() {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Feed</Text>
-      </View>
-    );
-  }
-}
 
-class Settings extends Component {
-  render() {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Settings</Text>
-      </View>
-    );
-  }
-}
 
-class Profile extends Component {
-  render() {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Profile</Text>
-      </View>
-    );
-  }
-}
+
+
 
 
 const ShopStack = createStackNavigator(
@@ -209,6 +186,7 @@ const ProfileStack = createStackNavigator({
     navigationOptions: ({ navigation }) => {
       return {
         headerTitle: 'Profile',
+         header: null,
         headerLeft: (
           <Icon style={{ paddingLeft: 10 }} onPress={() => navigation.openDrawer()} name="md-menu" size={30} />
         )
@@ -223,6 +201,7 @@ const SettingsStack = createStackNavigator({
     navigationOptions: ({ navigation }) => {
       return {
         headerTitle: 'Settings',
+        header: null,
         headerLeft: (
           <Icon style={{ paddingLeft: 10 }} onPress={() => navigation.openDrawer()} name="md-menu" size={30} />
         )
@@ -321,12 +300,58 @@ const customDrawerComponent =(props) =>(
 </SafeAreaView>
 )
 
+class Wishlist extends Component {
+   static navigationOptions={
+drawerIcon:()=>(
+  <Icon style={{fontSize:24,color:"#000" }} name="ios-heart" />
+  )
+  }
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Wishlist</Text>
+      </View>
+    );
+  }
+}
+
+class Logout extends Component {
+   static navigationOptions={
+drawerIcon:()=>(
+  <Icon style={{fontSize:24,color:"#000" }} name="ios-log-out" />
+  )
+  }
+  render() {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Logout</Text>
+      </View>
+    );
+  }
+}
+
+
 const AppDrawerNavigator = createDrawerNavigator({
   Dashboard: {
     screen: DashboardStackNavigator
   },
-  Home: {
+  Shop: {
     screen: Shop
+  },
+  Profile: {
+    screen: Profile
+  },
+   Cart: {
+    screen: CartScreen
+  },
+  Wishlist: {
+    screen: Wishlist
+  },
+  Settings: {
+    screen: Settings
+  },
+ Logout: {
+    screen: Logout
   }
  
 },{
@@ -335,7 +360,7 @@ const AppDrawerNavigator = createDrawerNavigator({
 
 );
 const AppSwitchNavigator = createSwitchNavigator({
-  Login: { screen: AppDrawerNavigator,
+  Login: { screen: LoginPage,
     navigationOptions: {
       title: 'Home',
       header: null //this will hide the header

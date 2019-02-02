@@ -45,3 +45,33 @@ export function items(state = false, action) {
             return state;
     }
 }
+
+export function profile_Data(state = [], action) {
+    switch (action.type) {
+        case 'GET_PROFILE_DETAILS':
+            return action.payload;
+
+        default:
+            return state;
+    }
+}
+
+export function order_Data(state = [], action) {
+    switch (action.type) {
+        case 'GET_ORDER_DETAILS':
+            return action.payload;
+
+        default:
+            return state;
+    }
+}
+
+export function transaction_Data(state = [], action) {
+    switch (action.type) {
+        case 'GET_TRANSACTION_DETAILS':
+            return action.payload;
+
+        default:
+            return state;
+    }
+}

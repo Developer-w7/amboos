@@ -97,7 +97,7 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
  <StatusBar
      backgroundColor="#1D4B98"
      barStyle="light-content"
-     translucent={true}
+  
    />
       <View style={styles.container}>
         <Image
