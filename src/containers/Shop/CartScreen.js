@@ -7,7 +7,7 @@ import { StyleSheet, View , Text , FlatList, StatusBar, Button, SafeAreaView, Di
 
 import { withNavigation } from 'react-navigation';
 
-import { cartItems,itemsFetchData,dropItems,removeItems} from '../../action';
+import { cartItems,itemsFetchData,dropItems,removeItems,getCartList} from '../../action';
 import { createSwitchNavigator, createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation';
 const numColumns = 1;
 
@@ -22,8 +22,37 @@ var img4 = require('./images/wheat-in-a-sack.jpg');
 class CartScreen extends Component {
     constructor(props) {
     super(props);
-
+this.props.getCart(this.props.token);
     
+  }
+  state={
+    cartlist:[]
+  }
+
+  componentDidMount() {
+  
+    // fetch('http://techfactories.com/test2/index.php?route=api/cart/products&api_token='+this.props.token)
+    // .then((response) => response.json())
+    // .then((responseJson) => {
+    //     if(responseJson.products.length > 0){
+    //       this.setState({
+    //         cartlist:responseJson.products
+    //       });
+    //       // alert(JSON.stringify(responseJson.products));
+    //         // items=responseJson.data.products;
+    //         // console.log(items);
+    //         // dispatch({ type:'GET_WISHLIST',
+    //         // payload:responseJson.data.products});
+           
+    //     }
+       
+    // })
+    // .catch((error) => {
+    //     console.error(error);
+    //     //dispatch(itemsHaveError(true))
+    // });
+  
+  
   }
 
   static navigationOptions={
@@ -47,7 +76,56 @@ return result;
 //console.log(array);
 }
 
+processCheckout(){
+  // if(this.props.cartItems.length > 0){
+    this.props.navigation.navigate('CheckOut')
+//     let  products=this._processcart(this.props.cartItems)
+//       fetch('http://techfactories.com/test2/index.php?route=api/cart/productAdd&api_token='+this.props.token, {
+//   method: 'POST',
+//   headers: {
+//     Accept: 'application/json',
+//     'Content-Type': 'application/json',
+//   },
+//   body: JSON.stringify(products),
+// }).then((response) => response.json())
+//     .then((responseJson) => {
+//       alert(JSON.stringify(responseJson));
+//       console.log(responseJson)
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//     });
+  // }else{
+  //   alert('Your Cart is empty!....Please add products to cart')
+  // }
+ 
 
+  // alert(JSON.stringify(this.props));
+  // let product=[{"product_id":11,"quantity":1}];
+  // let formdata = new FormData();
+  // // alert(product);
+  // formdata.append("product",product);
+  // formdata.append("quantuty",1);
+  //  fetch('http://techfactories.com/test2/index.php?route=api/cart/productAdd&api_token='+this.props.token, {
+  //             method: 'post',
+  //             headers: {
+  //                 'Content-Type': 'multipart/form-data',
+  //             },
+  //             body: JSON.stringify(formdata)
+  //         })
+  //         .then((response) => response.json())
+  //         .then((responseJson) => {
+          
+  //             console.log(responseJson);
+      
+
+  //         })
+  //         .catch((error) => {
+  //             console.error(error);
+  //             //dispatch(itemsHaveError(true))
+  //         });
+  // this.props.navigation.navigate('CheckOut')
+}
 _renderItem = ({ item, index }) => {
     if (item.empty === true) {
       return <View style={[styles.item, styles.itemInvisible]} />;
@@ -64,10 +142,11 @@ _renderItem = ({ item, index }) => {
         />
         <Text style={styles.itemText}>{item.product_name.toUpperCase()}</Text>
        <Text style={styles.count}>{item.count} </Text>
+     
        <View style={styles.buttonwrap}>
-         <TouchableOpacity  onPress={() => this.props.addItemToCart({"product_id":item.product_id,"product_name":item.product_name,"thumb":item.thumb})} style={[styles.button,styles.addbutton]} ><Icon style={{color: 'green'}}  name="md-add" size={14} /></TouchableOpacity>
-         <TouchableOpacity  onPress={() => this.props.dropItemFromCart({"product_id":item.product_id})} style={[styles.button,styles.dropbutton]}><Icon style={{color: 'red'}} name="md-remove" size={14} /></TouchableOpacity>
-         <TouchableOpacity  onPress={() => this.props.removeItem({"product_id":item.product_id})} style={[styles.button, styles.removebutton]}><Icon  style={{color: '#f7041d'}} name="md-close" size={14} /></TouchableOpacity>
+         <TouchableOpacity  onPress={() => this.props.addItemToCart({"product_id":item.product_id,"product_name":item.product_name,"thumb":item.thumb,"token":this.props.token})} style={[styles.button,styles.addbutton]} ><Icon style={{color: 'green'}}  name="md-add" size={14} /></TouchableOpacity>
+         <TouchableOpacity  onPress={() => this.props.dropItemFromCart({"product_id":item.product_id,"token":this.props.token,"cart_id":item.cart_id,"count":item.count})} style={[styles.button,styles.dropbutton]}><Icon style={{color: 'red'}} name="md-remove" size={14} /></TouchableOpacity>
+         <TouchableOpacity  onPress={() => this.props.removeItem({"product_id":item.product_id,"token":this.props.token,"cart_id":item.cart_id})} style={[styles.button, styles.removebutton]}><Icon  style={{color: '#f7041d'}} name="md-close" size={14} /></TouchableOpacity>
        
       
          </View>
@@ -82,14 +161,14 @@ _renderItem = ({ item, index }) => {
            <Text style={{textAlign: 'center',fontSize: 20,fontWeight: '600',paddingVertical: 18   }}>Cart View</Text>
                  <FlatList
         data={this._processcart(this.props.cartItems)}
-        style={styles.container}
+       
         renderItem={this._renderItem}
         numColumns={numColumns}
         scrollEnabled={true}
          keyExtractor={(item, index) => index.toString()}
       />
       <View style={styles.bottom}>
-     <TouchableOpacity  style={{paddingVertical: 16,marginRight: 1,backgroundColor: '#1B4C99',flexDirection: 'row' ,alignItems: 'center',justifyContent: 'center'      }} onPress={() => alert('checkout')}>
+     <TouchableOpacity  style={{paddingVertical: 16,marginRight: 1,backgroundColor: '#1B4C99',flexDirection: 'row' ,alignItems: 'center',justifyContent: 'center'      }} onPress={() =>this.processCheckout() }>
        
             <Icon style={{color: '#fff',paddingHorizontal: 8}}  name="ios-cart" size={30} /><Text style={{color: '#fff', fontWeight: 'bold' }}>PROCEED TO CHECKOUT</Text>
    
@@ -104,7 +183,8 @@ _renderItem = ({ item, index }) => {
 const mapStateToProps = (state) => {
   console.log(state);
     return {
-        cartItems: state.cartItems
+        cartItems: state.cartItems,
+        token:state.authUser.token
     }
 }
 
@@ -112,7 +192,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
        addItemToCart: (product) => dispatch(cartItems(product , 'ADD_TO_CART')),
        dropItemFromCart: (product_id) => dispatch(dropItems(product_id , 'DROP_ITEM_FROM_CART')),
-       removeItem: (product_id) => dispatch(removeItems(product_id , 'REMOVE_FROM_CART'))
+       removeItem: (product_id) => dispatch(removeItems(product_id , 'REMOVE_FROM_CART')),
+       getCart: (token) => dispatch(getCartList(token))
   }
 }
 

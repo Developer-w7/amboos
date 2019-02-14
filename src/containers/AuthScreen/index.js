@@ -10,7 +10,7 @@ import LoginForm from './LoginForm'
 import LinearGradient from 'react-native-linear-gradient';
 import { connect } from 'react-redux'
 import thunk from 'redux-thunk';
-import { cartItems,itemsFetchData } from '../../action';
+import { cartItems,itemsFetchData,saveUserAccess} from '../../action';
 import store from '../../store'
 const IMAGE_WIDTH = metrics.DEVICE_WIDTH * 0.6
 if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(true)
@@ -44,6 +44,7 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
  *   2. fadeOut the logo, 3. tells the container that the login animation has completed and that the app is ready to show the next screen (HomeScreen).
  */
  class AuthScreen extends Component {
+   
   static propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
@@ -57,7 +58,9 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
   }
 
    componentDidMount() {
-        this.props.fetchData();
+    
+        // this.props.fetchData();
+        this.props.saveUserToken();   
     }
   componentWillUpdate (nextProps) {
     // If the user has logged/signed up succesfully start the hide animation
@@ -83,12 +86,17 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
     // 2. Configure a spring animation for the next step
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring)
     // 3. Set the new visible form
-    this.setState({ visibleForm })
+    // if(this.props.token && this.props.token.api_token){
+      this.setState({ visibleForm })
+    // }
+   
   }
+ 
 
   render () {
+    // alert(JSON.stringify(this.props.token.api_token));
      //console.log(this.props.token);
-    const { isLoggedIn, isLoading, signup, login } = this.props
+    const { isLoggedIn, isLoading, signup, login} = this.props
     const { visibleForm } = this.state
     // The following style is responsible of the "bounce-up from bottom" animation of the form
     const formStyle = (!visibleForm) ? { height: 0 } : { marginTop: 40 }
@@ -108,10 +116,11 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
           style={styles.logoImg}
           source={imgLogo}
         />
+      
         {(!visibleForm && !isLoggedIn) && (
           <Opening
-            onCreateAccountPress={() => this._setVisibleForm('SIGNUP')}
-            onSignInPress={() => this._setVisibleForm('LOGIN')}
+            onCreateAccountPress={() => this.props.token?this._setVisibleForm('SIGNUP'):''}
+            onSignInPress={() => (this.props.token?this._setVisibleForm('LOGIN'):'')}
           />
         )}
         <KeyboardAvoidingView
@@ -119,6 +128,7 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
           behavior={'padding'}
           style={[formStyle, styles.bottom]}
         >
+
           {(visibleForm === 'SIGNUP') && (
             <SignupForm
               ref={(ref) => this.formRef = ref}
@@ -137,7 +147,7 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
           )}
         </KeyboardAvoidingView>
 
-
+      
       </View>
        </LinearGradient>
     )
@@ -145,16 +155,20 @@ if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental(t
 }
 const mapStateToProps = (state) => {
     return {
-         token: state.items,
-         hasError: state.itemsHaveError,
-         isLoading: state.itemsAreLoading
+         token: state.authUser.token,
+         hasError: state.authUser.error,
+         isLoading: state.authUser.loading,
+         loggedIn: state.authUser.loggedIn,
+         loggedUser: state.authUser.loggedUser,
+         
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
   
-      fetchData: () => dispatch(itemsFetchData())
+      // fetchData: () => dispatch(itemsFetchData()),
+    saveUserToken: () => dispatch(saveUserAccess())
   }
 }
 

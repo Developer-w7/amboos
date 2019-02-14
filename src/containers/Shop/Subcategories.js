@@ -33,18 +33,33 @@ class Subcategories extends Component {
  
   state = {
     Data:[],
+    fill:[],
     item_id:"",
     main:[],
     loader:true,
-    token:''
+    token:'',
+    refresh:false,
+    page:1,
+    cat_id:""
     
   }
+  handleLoadMore=()=>{
+    this.setState({page:this.state.page +1},()=>{
+      console.log(this.state.page);
+      formdata = new FormData();
+      formdata.append("category_id", this.state.cat_id);
+      formdata.append("page", this.state.page);
+      console.log(formdata);
+      this._getCategoriesFromApiAsync(formdata);
 
+    })
+  }
   componentWillMount(){
     const itemId = this.props.navigation.getParam('itemId', 'NO-ID');
     const get_token = this.props.navigation.getParam('token');
      token=get_token;
-     formdata.append("category_id", itemId);
+     this.setState({cat_id:itemId})
+    
      if(ren_data != null){
       ren_data=[];
      }
@@ -52,7 +67,10 @@ class Subcategories extends Component {
      
   }
 componentDidMount() {
-this._getCategoriesFromApiAsync();
+  formdata.append("category_id", this.state.cat_id);
+  formdata.append("page", this.state.page);
+  console.log(formdata);
+this._getCategoriesFromApiAsync(formdata);
 }
    onChangeText(text, index, data) {
    if(data[index].cat_id){
@@ -64,23 +82,27 @@ this._getCategoriesFromApiAsync();
  
    }
 
-  _getCategoriesFromApiAsync=() => {
-    return fetch('http://techfactories.com/test2/index.php?route=api/category/categoryproduct&api_token='+token,{
+  _getCategoriesFromApiAsync=(form_data) => {
+
+    return fetch('http://techfactories.com/test2/index.php?route=api/category/categoryproduct&limit=30&api_token='+token,{
       method: 'post',
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      body: formdata
+      body: form_data
       })
       .then((response) => response.json())
       .then((responseJson) => {
+        
+if(responseJson != null){
+this.setState({fill:[...this.state.fill,...responseJson.data.products]});
+this.setState({ Data:responseJson.data})     
+}
 
 
 
-        this.setState({ Data:responseJson.data})
         if( responseJson.data.categories){
-
-           responseJson.data.categories.forEach(function (value) {
+        responseJson.data.categories.forEach(function (value) {
           var jsonObject = {value:value.name, cat_id:value.category_id}; 
         ren_data.push(jsonObject);
         });
@@ -157,12 +179,17 @@ label='Categories'
        data={this.state.main}/>
        </LinearGradient>
          <FlatList
-        data={this.state.Data.products}
+        data={this.state.fill}
         style={styles.container}
         renderItem={this._renderItem}
         numColumns={numColumns}
         scrollEnabled={false}
-         keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => index.toString()}
+        refreshing={this.state.refresh}
+        onRefresh={this.handle_refresh}
+        onEndReached={this.handleLoadMore}
+        onEndReachedThreshold={10}
+ 
       />
       </View>
       </ScrollView>
@@ -246,9 +273,6 @@ color: '#000',
     letterSpacing: 1
   }
 })
-
-
-
 
 
 export default withNavigation(Subcategories);

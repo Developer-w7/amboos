@@ -12,9 +12,9 @@ import { Dropdown } from 'react-native-material-dropdown';
 import { FetchData} from '../../action';
 let formdata = new FormData();
 const numColumns = 1;
-formdata.append("email", 'johnmathew@gmail.com');
+// formdata.append("email", 'johnmathew@gmail.com');
 
-formdata.append("password", 'john@123');
+// formdata.append("password", 'john@123');
 
 class Orders extends Component {
 

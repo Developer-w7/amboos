@@ -7,7 +7,7 @@ import thunk from 'redux-thunk';
 import HTMLView from 'react-native-htmlview';
 import { withNavigation } from 'react-navigation';
 import { Dropdown } from 'react-native-material-dropdown';
-import { cartItems,itemsFetchData } from '../../action';
+import { cartItems,addwishItems} from '../../action';
 import store from '../../store'
 /**
  * Just a centered logout button.
@@ -41,6 +41,7 @@ class Product extends Component {
   }
 
  componentDidMount() {
+   
         //this.props.fetchData();
     }
 
@@ -101,7 +102,7 @@ return   <ImageBackground source={{uri:images}} style={{
  
 
     if(this.state.loader == false){
-    	 return (
+       return (
   
         <ScrollView>
      <View style={styles.container}>
@@ -109,13 +110,13 @@ return   <ImageBackground source={{uri:images}} style={{
            <Text style={styles.product_name}>{this.state.Data.name.toUpperCase()}</Text>
         <Text style={styles.price}>{this.state.Data.price}</Text>
         <View style={{flex:1,flexDirection: 'row' ,alignItems: 'center' ,paddingVertical: 14  }}>
-         <TouchableOpacity  style={{paddingVertical: 20,marginRight: 1,backgroundColor: '#1B4C99',flex:1,flexDirection: 'row' ,alignItems: 'center',justifyContent: 'center'      }} onPress={() => this.props.addItemToCart({"product_id":this.state.Data.product_id,"product_name":this.state.Data.name,"thumb":this.state.Data.thumb})}>
+         <TouchableOpacity  style={{paddingVertical: 20,marginRight: 1,backgroundColor: '#1B4C99',flex:1,flexDirection: 'row' ,alignItems: 'center',justifyContent: 'center'      }} onPress={() => this.props.addItemToCart({"product_id":this.state.Data.product_id,"product_name":this.state.Data.name,"thumb":this.state.Data.thumb,"token":this.props.token})}>
        
             <Icon style={{color: '#fff',paddingHorizontal: 8}}  name="ios-cart" size={30} /><Text style={{color: '#fff', fontWeight: 'bold' }}>Add to cart</Text>
    
         
         </TouchableOpacity>
-         <TouchableOpacity  style={{paddingVertical: 20,marginLeft: 1,backgroundColor: '#eee',flex:1,flexDirection: 'row' ,alignItems: 'center',justifyContent: 'center'      }} onPress={() => this.props.addItemToCart({"product_id":this.state.Data.product_id,"product_name":this.state.Data.name,"thumb":this.state.Data.thumb})}>
+         <TouchableOpacity  style={{paddingVertical: 20,marginLeft: 1,backgroundColor: '#eee',flex:1,flexDirection: 'row' ,alignItems: 'center',justifyContent: 'center'      }} onPress={() => this.props.addItemToWishList({"product_id":this.state.Data.product_id,"product_name":this.state.Data.name,"thumb":this.state.Data.thumb,"token":this.props.token})}>
        
             <Icon style={{color: 'red',paddingHorizontal: 8}}  name="ios-heart" size={30} /><Text style={{color: '#000', fontWeight: 'bold' }}>Add to wishlist</Text>
    
@@ -136,7 +137,7 @@ return   <ImageBackground source={{uri:images}} style={{
   
     )
     }else{
-    	 return (
+       return (
      <View style={styles.loader}>
      <ActivityIndicator size="large" color="#00ff00" />
     
@@ -153,14 +154,16 @@ return   <ImageBackground source={{uri:images}} style={{
 }
 
 Product.propTypes = {
-    addItemToCart: PropTypes.func.isRequired
+    addItemToCart: PropTypes.func.isRequired,
+    addItemToWishList: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => {
     return {
          token: state.items,
          hasError: state.itemsHaveError,
-         isLoading: state.itemsAreLoading
+         isLoading: state.itemsAreLoading,
+         token:state.authUser.token
     };
 };
 
@@ -168,7 +171,8 @@ const mapDispatchToProps = (dispatch) => {
 
   return {
 
-      addItemToCart: (product) =>  dispatch(cartItems( product ,'ADD_TO_CART'))
+      addItemToCart: (product) =>  dispatch(cartItems( product ,'ADD_TO_CART')),
+      addItemToWishList: (product) => dispatch(addwishItems(product ,'ADD_TO_WISHLIST'))
 
   }
 }

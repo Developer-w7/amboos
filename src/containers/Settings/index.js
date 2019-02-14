@@ -1,6 +1,6 @@
 import React, { Component} from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View , Text , FlatList, ActivityIndicator, StatusBar, Button, SafeAreaView, Dimensions, Image, ScrollView, ImageBackground, TouchableOpacity} from 'react-native'
+import { StyleSheet,KeyboardAvoidingView, View , Text , FlatList, ActivityIndicator, StatusBar, Button, SafeAreaView, Dimensions, Image, ScrollView, ImageBackground, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { connect } from 'react-redux'
 import { AsyncStorage } from "react-native"
@@ -13,36 +13,20 @@ import { FetchData} from '../../action';
 import t from 'tcomb-form-native';
 
 const Form = t.form.Form;
-const User = t.struct({
-  email: t.String,
-  username: t.String,
-  password: t.String,
-  terms: t.Boolean
-});
-
-var Gender = t.enums({
-  M: 'Male',
-  F: 'Female'
-});
+let formdata = new FormData();
 // see the "Rendering options" section in this guide
 var options = {
-	stylesheet: styles,
-  fields: {
-    birthDate: {
-      mode: 'date' // display the Date field as a DatePickerAndroid
-    },
-    gender: {
-      nullOption: {value: '', text: 'Choose your gender'}
-    }
-  }
+  stylesheet: styles,
+  auto: 'placeholders'
 };
 var Person = t.struct({
   First_Name: t.String,
   Last_Name: t.String,
   Email: t.maybe(t.String),
-  Telephone: t.Number,
-  // birthDate: t.Date,
-  // gender: Gender // enum
+  Telephone: t.Number
+});
+var Password = t.struct({
+   NewPassword: t.Number
 });
 class Settings extends Component {
 
@@ -59,26 +43,138 @@ drawerIcon:()=>(
  
   state = {
     Data:[],
-    token:'be0bcbc31f28641dedb77be3e1'
-    
+    token:'be0bcbc31f28641dedb77be3e1',
+    value:{
+      First_Name: "demo",
+      Last_Name: "man",
+      Email: "demo@gmail.com",
+      Telephone: "7012749699"
+    },
+    status:[]
   }
+  componentDidMount() {
+    this._retrieveData().then(() =>{
+      this._getProfile();
+   } ); 
+       
+    }
+
+    _getProfile=() => {
+      return fetch('http://techfactories.com/test2/index.php?route=api/account&api_token='+this.state.token)
+        .then((response) => response.json())
+        .then((responseJson) => {
+          this.setState({ Data:responseJson.data})
+          let profile={
+            First_Name:responseJson.data.firstname,
+      Last_Name: responseJson.data.lastname,
+      Email: responseJson.data.email,
+      Telephone:responseJson.data.telephone
+          }
+          this.setState({value:profile});
+          console.log(this.state.Data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+    _retrieveData = async () => {
+      try {
+        const value = await AsyncStorage.getItem('session_token');
+        if (value !== null) {
+          this.setState({ token:value});
+          // We have data!!
+          //console.log(value);
+        }
+       } catch (error) {
+          console.log(error);
+       }
+    }
+
+    _updateProfile=(value) => {
+   
+      formdata.append("Firstname:", value.First_Name);
+      formdata.append("lastname:", value.Last_Name);
+      formdata.append("email:", value.Email);
+      formdata.append("telephone:", value.Telephone);
+console.log(formdata);
+      return fetch('http://techfactories.com/test2/index.php?route=api/account/edit&api_token='+this.state.token,{
+        method: 'post',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formdata
+        })
+        .then((response) => {
+          console.log(response);
+        }).catch((error) => {
+          console.error(error);
+        });
+    }
+
+  onPress= () =>{
   
-  render() {
+    var value = this.refs.form.getValue();
+    if (value) { // if validation fails, value will be null
+
+
+      if(this.state.token){
+        this._updateProfile(value);
+      }
+        
+    
+      //console.log(value); // value here is an instance of Person
+    }
+  }
+  render() {  
+    
 
 
     return (
 	<ScrollView>
+        <KeyboardAvoidingView>
 	<Text style={styles.heading}>EDIT PROFILE</Text>
      <View style={styles.container}>
-        <Form type={Person} options={options} />
+ 
+        <Form ref="form" type={Person} value={this.state.value} options={options} />
+      
       </View>
-<TouchableOpacity style={styles.button} onPress={() => {alert('working')}}>
+<TouchableOpacity style={styles.button} onPress={this.onPress}>
         <Text style={styles.buttonText}>UPDATE</Text>
         </TouchableOpacity>
+
+        <Text style={styles.heading}>CHANGES PASSWORD</Text>
+     <View style={styles.container}>
+ 
+        <Form ref="password" type={Password} value={this.state.value} options={options} />
+      
+      </View>
+<TouchableOpacity style={styles.button} onPress={this.onPress}>
+        <Text style={styles.buttonText}>UPDATE</Text>
+        </TouchableOpacity>
+        </KeyboardAvoidingView>
      </ScrollView>
     );
   }
 }
+
+const mapStateToProps = (state) => {
+
+  return {
+      cartItems: state.cartItems
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+return {
+     addItemToCart: (product) => dispatch(cartItems(product , 'ADD_TO_CART')),
+     dropItemFromCart: (product_id) => dispatch(dropItems(product_id , 'DROP_ITEM_FROM_CART')),
+     removeItem: (product_id) => dispatch(removeItems(product_id , 'REMOVE_FROM_CART'))
+}
+}
+export default connect(mapStateToProps, mapDispatchToProps)(withNavigation(Settings));
+
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -149,4 +245,3 @@ borderRadius: 3
 
 
 
-export default Settings;

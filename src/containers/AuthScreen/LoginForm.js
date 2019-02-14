@@ -2,12 +2,19 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet } from 'react-native'
 import { Text, View } from 'react-native-animatable'
-
+import { withNavigation } from 'react-navigation'
+import { connect } from 'react-redux'
+import thunk from 'redux-thunk';
+import { FetchData,currentLoggedUser,getUserToken,saveCurrentUser,loggedUser} from '../../action';
 import CustomButton from '../../components/CustomButton'
 import CustomTextInput from '../../components/CustomTextInput'
 import metrics from '../../config/metrics'
 
-export default class LoginForm extends Component {
+class LoginForm extends Component {
+  constructor(props){
+    super(props);
+    // this.props.getCurrentUserData();
+  }
   static propTypes = {
     isLoading: PropTypes.bool.isRequired,
     onLoginPress: PropTypes.func.isRequired,
@@ -29,10 +36,47 @@ export default class LoginForm extends Component {
       ])
     }
   }
+  _doLogin=(email,password)=>{
+    let formdata = new FormData();
+    if(email =='' || password ==''){
+
+      alert('Please fill all fields!!!...');
+
+  }else{
+    formdata.append("email", email);
+    formdata.append("password",password);
+    
+    fetch('http://techfactories.com/test2/index.php?route=api/customerlogin&api_token='+this.props.token, {
+      method: 'post',
+      headers: {
+          'Content-Type': 'multipart/form-data',
+      },
+      body: formdata
+      })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        if(responseJson.success){
+          this.setState({isLoggedIn:true,isLoading:false});
+          this.props.saveCurrUser(responseJson.data);
+          this.props.navigation.navigate('Dashboard');
+        }else{
+          alert('some error occured please try again later...');
+          this.props.navigation.navigate('Login');
+        }
+       
+      })
+      .catch((error) => {
+
+        console.log(error);
+        this.props.navigation.navigate('Login');
+    });
+  }
+    // alert(JSON.stringify(this.props.usertoken));
+  };
 
   render () {
     const { email, password } = this.state
-    const { isLoading, onSignupLinkPress, onLoginPress } = this.props
+    const { isLoading, onSignupLinkPress, onLoginPress,token } = this.props
     const isValid = email !== '' && password !== ''
     return (
       <View style={styles.container}>
@@ -65,7 +109,7 @@ export default class LoginForm extends Component {
         <View style={styles.footer}>
           <View ref={(ref) => this.buttonRef = ref} animation={'bounceIn'} duration={600} delay={400}>
             <CustomButton
-              onPress={() => onLoginPress(email, password)}
+              onPress={() => this._doLogin(email, password)}
               isEnabled={isValid}
               isLoading={isLoading}
               buttonStyle={styles.loginButton}
@@ -99,7 +143,30 @@ export default class LoginForm extends Component {
     )
   }
 }
+const mapStateToProps = (state) => {
 
+  return {
+     
+      // currentuser:state.currentUser,
+      // usertoken:state.authUser,
+      token:state.authUser.token,
+      error:state.authUser.error,
+      loggedIn:state.authUser.loggedIn,
+      loggedUser:state.authUser.loggedUser
+
+  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+  
+      
+        // getCurrentUserData:()=>dispatch(getUserToken()),
+        saveCurrUser:(data)=>dispatch(loggedUser(data)),
+  
+        
+  }
+  }
+  export default connect(mapStateToProps, mapDispatchToProps)(withNavigation(LoginForm));
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: metrics.DEVICE_WIDTH * 0.1

@@ -15,9 +15,11 @@ export default class SignupForm extends Component {
   }
 
   state = {
+    firstname:'',
+    lastname:'',
     email: '',
     password: '',
-    fullName: ''
+    telephone: ''
   }
 
   hideForm = async () => {
@@ -31,21 +33,32 @@ export default class SignupForm extends Component {
   }
 
   render () {
-    const { email, password, fullName } = this.state
+    const { firstname,lastname,email, password, telephone } = this.state
     const { isLoading, onLoginLinkPress, onSignupPress } = this.props
-    const isValid = email !== '' && password !== '' && fullName !== ''
+    const isValid = email !== '' && password !== '' && firstname && lastname !== ''
     return (
       <View style={styles.container}>
         <View style={styles.form} ref={(ref) => this.formRef = ref}>
-          <CustomTextInput
+        <CustomTextInput
             ref={(ref) => this.mobileInputRef = ref}
-            placeholder={'Full name'}
+            placeholder={'First name'}
             editable={!isLoading}
             returnKeyType={'next'}
             blurOnSubmit={false}
             withRef={true}
             onSubmitEditing={() => this.emailInputRef.focus()}
-            onChangeText={(value) => this.setState({ fullName: value })}
+            onChangeText={(value) => this.setState({ firstname: value })}
+            isEnabled={!isLoading}
+          />
+          <CustomTextInput
+            ref={(ref) => this.mobileInputRef = ref}
+            placeholder={'Last name'}
+            editable={!isLoading}
+            returnKeyType={'next'}
+            blurOnSubmit={false}
+            withRef={true}
+            onSubmitEditing={() => this.emailInputRef.focus()}
+            onChangeText={(value) => this.setState({ lastname: value })}
             isEnabled={!isLoading}
           />
           <CustomTextInput
@@ -70,11 +83,22 @@ export default class SignupForm extends Component {
             onChangeText={(value) => this.setState({ password: value })}
             isEnabled={!isLoading}
           />
+          <CustomTextInput
+            ref={(ref) => this.mobileInputRef = ref}
+            placeholder={'Telephone'}
+            editable={!isLoading}
+            returnKeyType={'next'}
+            blurOnSubmit={false}
+            withRef={true}
+            onSubmitEditing={() => this.emailInputRef.focus()}
+            onChangeText={(value) => this.setState({ telephone: value })}
+            isEnabled={!isLoading}
+          />
         </View>
         <View style={styles.footer}>
           <View ref={(ref) => this.buttonRef = ref} animation={'bounceIn'} duration={600} delay={400}>
             <CustomButton
-              onPress={() => onSignupPress(email, password, fullName)}
+              onPress={() => onSignupPress(firstname,lastname,email, password, telephone)}
               isEnabled={isValid}
               isLoading={isLoading}
               buttonStyle={styles.createAccountButton}
